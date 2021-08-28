@@ -20,9 +20,8 @@ fun main(args: Array<String>) {
 				./plugin-updater.jar
 					<target plugin,target plugin 2 ...>
 					<root server directory, default: ..>
-					<local jar file, default: first found target plugin in ./>
 					<backup old plugin version, default: true>
-				example: ./plugin-updater.jar ViaVersion .. ./ViaVersion.jar
+				example: ./plugin-updater.jar ViaVersion .. false
 				
 				tip: you can use "<argument>"
 				
@@ -43,36 +42,28 @@ fun run(args: Array<String>) {
 	PluginUpdater.initialize(
 		args[0],
 		if (args.size <= 1) File("..") else File(args[1]),
-		if (args.size <= 2)
-			File(".").listFiles()?.
-			filter { it.name.endsWith(".jar") }?.filter {
-				try {
-					InputStreamReader(
-						JarFile(it).getInputStream(
-							ZipEntry("plugin.yml")
-						)
+		File(".").listFiles()?.
+		filter { it.name.endsWith(".jar") }?.filter {
+			try {
+				InputStreamReader(
+					JarFile(it).getInputStream(
+						ZipEntry("plugin.yml")
 					)
-					return@filter true
-				} catch (e: Exception) {
-					return@filter false
-				}
-			}?.filter {
-				PluginUpdater.isFileIsPlugin(it, args[0])
+				)
+				return@filter true
+			} catch (e: Exception) {
+				return@filter false
 			}
-				?.getOrNull(0)
-				?: run {
-					println("(error) No jar file containing plugin ${args[0]} was found!")
-					return
-				} else {
-			if (File(args[2]).exists()) {
-				File(args[2])
-			} else {
-				println("(error) No such file: ${args[2]}")
-				return
-			}
+		}?.filter {
+			PluginUpdater.isFileIsPlugin(it, args[0])
+		}
+		?.getOrNull(0)
+		?: run {
+			println("(error) No jar file containing plugin ${args[0]} was found!")
+			return
 		},
-		if (args.size <= 3) true else args[3].lowercase().toBooleanStrictOrNull() ?: run {
-			println("(error) Expected boolean, got: ${args[3]}")
+		if (args.size <= 2) true else args[2].lowercase().toBooleanStrictOrNull() ?: run {
+			println("(error) Expected boolean, got: ${args[2]}")
 			return
 		}
 	)
