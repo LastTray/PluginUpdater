@@ -49,12 +49,6 @@ application {
     setMainClassName 'com.magicsweet.pluginupdater.PluginUpdaterMainKt'
 }
 
-shadowJar {
-    dependencies {
-        include(dependency('.*:.*:.*'))
-    }
-}
-
 jar {
     enabled = false
     dependsOn << shadowJar
